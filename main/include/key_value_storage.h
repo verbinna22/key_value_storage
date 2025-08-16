@@ -27,7 +27,8 @@ class KVStorage {
         Clock clock = Clock());
     ~KVStorage();
 
-    void set(std::string key, std::string value, std::uint32_t timestamp);
+    void set(const std::string &key, const std::string &value,
+             std::uint32_t timestamp);
     bool remove(std::string_view key);
     std::optional<std::string> get(std::string_view key) const;
     std::vector<std::pair<std::string, std::string>> getManySorted(
@@ -40,6 +41,11 @@ class KVStorage {
     std::map<std::string_view, std::pair<std::string, timestampIteratorType>>
         _keyToValue;
     Clock _clock;
+
+    void addWithTimestamp(const std::string &key,
+                          const std::string &value,
+                          std::uint32_t timestamp,
+                          std::uint64_t time);
 };
 
 template <TimeGetter Clock>
@@ -49,14 +55,8 @@ inline KVStorage<Clock>::KVStorage(
     : _clock(clock) {
     std::uint64_t time = _clock.getTime();
     for (const auto &entry : entries) {
-        auto timestamp = std::get<2>(entry);
-        auto expirationTime = (timestamp == 0)
-                                  ? std::numeric_limits<std::uint64_t>::max()
-                                  : time + timestamp;
-        auto iterator = _timestampToKey.insert(
-            std::pair(expirationTime, std::get<0>(entry)));
-        _keyToValue[std::get<0>(entry)] =
-            std::make_pair(std::get<1>(entry), iterator);
+        addWithTimestamp(std::get<0>(entry), std::get<1>(entry),
+                         std::get<2>(entry), time);
     }
 }
 
@@ -64,14 +64,10 @@ template <TimeGetter Clock>
 inline KVStorage<Clock>::~KVStorage() {}
 
 template <TimeGetter Clock>
-inline void KVStorage<Clock>::set(std::string key, std::string value,
+inline void KVStorage<Clock>::set(const std::string &key,
+                                  const std::string &value,
                                   std::uint32_t timestamp) {
-    std::uint64_t time = _clock.getTime();
-    auto expirationTime = (timestamp == 0)
-                                  ? std::numeric_limits<std::uint64_t>::max()
-                                  : time + timestamp;
-    auto iterator = _timestampToKey.insert(std::pair(expirationTime, key));
-    _keyToValue[key] = std::make_pair(value, iterator);
+    addWithTimestamp(key, value, timestamp, _clock.getTime());
 }
 
 template <TimeGetter Clock>
@@ -103,6 +99,18 @@ template <TimeGetter Clock>
 inline std::optional<std::pair<std::string, std::string>>
 KVStorage<Clock>::removeOneExpiredEntry() {
     throw std::runtime_error("Not implemented");
+}
+
+template <TimeGetter Clock>
+inline void KVStorage<Clock>::addWithTimestamp(const std::string &key,
+                                               const std::string &value,
+                                               std::uint32_t timestamp,
+                                               std::uint64_t time) {
+    auto expirationTime = (timestamp == 0)
+                              ? std::numeric_limits<std::uint64_t>::max()
+                              : time + timestamp;
+    auto iterator = _timestampToKey.insert(std::pair(expirationTime, key));
+    _keyToValue[key] = std::make_pair(value, iterator);
 }
 
 #endif  // KEY_VALUE_STORAGE_H

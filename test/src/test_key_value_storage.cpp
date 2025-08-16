@@ -298,7 +298,9 @@ TEST_F(KVSInitSimple,
 
 TEST_F(KVSInitSimple,
        getManySorted_getAllFromStartInTheSameTimeAfterStorageSet_returnsAll) {
-    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(0ULL))
+        .WillOnce(testing::Return(0ULL));
     storage->set("c", "kNew", 1);
     auto values = storage->getManySorted("a", 5);
 

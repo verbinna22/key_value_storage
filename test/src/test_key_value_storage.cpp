@@ -17,48 +17,39 @@ struct KVSInitSimple : public testing::Test {
             std::make_tuple<std::string, std::string>("b", "k2", 5U),
             std::make_tuple<std::string, std::string>("c", "k3", 4U),
             std::make_tuple<std::string, std::string>("d", "k4", 6U),
-            std::make_tuple<std::string, std::string>("e", "k5", 0U)
-        };
-        EXPECT_CALL(timer, getTime())
-            .WillOnce(testing::Return(0ULL));
+            std::make_tuple<std::string, std::string>("e", "k5", 0U)};
+        EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
         storage = new KVStorage(entries, MockTimerWrapper(&timer));
     }
-    void TearDown() {
-        delete storage;
-    }
+    void TearDown() { delete storage; }
 };
 
 TEST_F(KVSInitSimple, get_existedValueA_returnsK1) {
-    EXPECT_CALL(timer, getTime())
-        .WillOnce(testing::Return(0ULL));
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
 
     EXPECT_EQ(storage->get("a"), "k1");
 }
 
 TEST_F(KVSInitSimple, get_expiredValueAInTime_returnsNullopt) {
-    EXPECT_CALL(timer, getTime())
-        .WillOnce(testing::Return(1ULL));
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(1ULL));
 
     EXPECT_EQ(storage->get("a"), std::nullopt);
 }
 
 TEST_F(KVSInitSimple, get_expiredValueAfterTime_returnsNullopt) {
-    EXPECT_CALL(timer, getTime())
-        .WillOnce(testing::Return(2ULL));
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(2ULL));
 
     EXPECT_EQ(storage->get("a"), std::nullopt);
 }
 
 TEST_F(KVSInitSimple, get_existedValueE_returnsK5) {
-    EXPECT_CALL(timer, getTime())
-        .WillOnce(testing::Return(0ULL));
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
 
     EXPECT_EQ(storage->get("e"), "k5");
 }
 
 TEST_F(KVSInitSimple, get_existedValueEAfter200_returnsK5) {
-    EXPECT_CALL(timer, getTime())
-        .WillOnce(testing::Return(200ULL));
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(200ULL));
 
     EXPECT_EQ(storage->get("e"), "k5");
 }
@@ -148,8 +139,7 @@ TEST_F(KVSInitSimple, remove_existedValueA_returnsTrue) {
 }
 
 TEST_F(KVSInitSimple, remove_existedValueA_doesNotContainA) {
-    EXPECT_CALL(timer, getTime())
-        .WillOnce(testing::Return(0ULL));
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
     EXPECT_TRUE(storage->remove("a"));
     EXPECT_EQ(storage->get("a"), std::nullopt);
 }
@@ -159,9 +149,26 @@ TEST_F(KVSInitSimple, remove_nonExistedValueU_returnsFalse) {
 }
 
 TEST_F(KVSInitSimple, getManySorted_getAllFromStartInTheSameTime_returnsAll) {
-    EXPECT_CALL(timer, getTime())
-        .WillOnce(testing::Return(0ULL));
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
     auto values = storage->getManySorted("a", 5);
+
+    EXPECT_EQ(values.size(), 5);
+    EXPECT_EQ(values[0].first, "a");
+    EXPECT_EQ(values[1].first, "b");
+    EXPECT_EQ(values[2].first, "c");
+    EXPECT_EQ(values[3].first, "d");
+    EXPECT_EQ(values[4].first, "e");
+    EXPECT_EQ(values[0].second, "k1");
+    EXPECT_EQ(values[1].second, "k2");
+    EXPECT_EQ(values[2].second, "k3");
+    EXPECT_EQ(values[3].second, "k4");
+    EXPECT_EQ(values[4].second, "k5");
+}
+
+TEST_F(KVSInitSimple,
+       getManySorted_getMoreThanAllFromStartInTheSameTime_returnsAll) {
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
+    auto values = storage->getManySorted("a", 6);
 
     EXPECT_EQ(values.size(), 5);
     EXPECT_EQ(values[0].first, "a");

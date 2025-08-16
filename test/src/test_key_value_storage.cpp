@@ -366,3 +366,12 @@ TEST_F(KVSInitBroad, removeOneExpiredEntry_afterGreatDelay_returnsAK1) {
     EXPECT_EQ(result.value().first, "a");
     EXPECT_EQ(result.value().second, "k1");
 }
+
+TEST_F(KVSInitBroad, removeOneExpiredEntry_afterAlmostAllExpired_returnsValue) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(200ULL));
+
+    auto result = storage->removeOneExpiredEntry();
+
+    EXPECT_TRUE(result.has_value());
+}

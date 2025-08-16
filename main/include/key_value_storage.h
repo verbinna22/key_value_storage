@@ -3,6 +3,7 @@
 
 #include <concepts>
 #include <cstdint>
+#include <limits>
 #include <map>
 #include <optional>
 #include <span>  // NOLINT
@@ -48,8 +49,12 @@ inline KVStorage<Clock>::KVStorage(
     : _clock(clock) {
     std::uint64_t time = _clock.getTime();
     for (const auto &entry : entries) {
+        auto timestamp = std::get<2>(entry);
+        auto expirationTime = (timestamp == 0)
+                                  ? std::numeric_limits<std::uint64_t>::max()
+                                  : time + timestamp;
         auto iterator = _timestampToKey.insert(
-            std::pair(time + std::get<2>(entry), std::get<0>(entry)));
+            std::pair(expirationTime, std::get<0>(entry)));
         _keyToValue[std::get<0>(entry)] =
             std::make_pair(std::get<1>(entry), iterator);
     }

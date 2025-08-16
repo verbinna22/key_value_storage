@@ -41,11 +41,18 @@ TEST_F(KVSInitSimple, get_expiredValueAInTime_returnsNullopt) {
     EXPECT_EQ(storage->get("a"), std::nullopt);
 }
 
-TEST_F(KVSInitSimple, get_expiredValueAAfterTime_returnsNullopt) {
+TEST_F(KVSInitSimple, get_expiredValueAfterTime_returnsNullopt) {
     EXPECT_CALL(timer, getTime())
         .WillOnce(testing::Return(2ULL));
 
     EXPECT_EQ(storage->get("a"), std::nullopt);
+}
+
+TEST_F(KVSInitSimple, get_existedValueE_returnsK5) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(0ULL));
+
+    EXPECT_EQ(storage->get("e"), "k5");
 }
 
 TEST_F(KVSInitSimple, set_nonExistedValueA_returnsKNew) {

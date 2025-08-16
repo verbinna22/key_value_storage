@@ -216,3 +216,16 @@ TEST_F(KVSInitSimple,
 
     EXPECT_EQ(values.size(), 0);
 }
+
+TEST_F(KVSInitSimple, getManySorted_getAllFromCInTheSameTime_returnsThree) {
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
+    auto values = storage->getManySorted("c", 5);
+
+    EXPECT_EQ(values.size(), 3);
+    EXPECT_EQ(values[0].first, "c");
+    EXPECT_EQ(values[1].first, "d");
+    EXPECT_EQ(values[2].first, "e");
+    EXPECT_EQ(values[0].second, "k3");
+    EXPECT_EQ(values[1].second, "k4");
+    EXPECT_EQ(values[2].second, "k5");
+}

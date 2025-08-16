@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <optional>
 #include <tuple>
 #include <vector>
 
@@ -64,18 +65,38 @@ TEST_F(KVSInitSimple, get_existedValueEAfter200_returnsK5) {
 
 TEST_F(KVSInitSimple, set_nonExistedValueW_returnsKNew) {
     EXPECT_CALL(timer, getTime())
-        .WillOnce(testing::Return(0ULL))
-        .WillOnce(testing::Return(0ULL));
+        .WillOnce(testing::Return(7ULL))
+        .WillOnce(testing::Return(7ULL));
 
     storage->set("w", "kNew", 6U);
 
     EXPECT_EQ(storage->get("w"), "kNew");
 }
 
+TEST_F(KVSInitSimple, set_nonExistedValueWAfterExpiration_returnsNullopt) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(2ULL))
+        .WillOnce(testing::Return(8ULL));
+
+    storage->set("w", "kNew", 6U);
+
+    EXPECT_EQ(storage->get("w"), std::nullopt);
+}
+
 TEST_F(KVSInitSimple, set_nonExistedValueWForeverTime_returnsKNew) {
     EXPECT_CALL(timer, getTime())
         .WillOnce(testing::Return(0ULL))
         .WillOnce(testing::Return(0ULL));
+
+    storage->set("w", "kNew", 0U);
+
+    EXPECT_EQ(storage->get("w"), "kNew");
+}
+
+TEST_F(KVSInitSimple, set_nonExistedValueWForeverTimeAfterDelay_returnsKNew) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(100ULL))
+        .WillOnce(testing::Return(1200ULL));
 
     storage->set("w", "kNew", 0U);
 

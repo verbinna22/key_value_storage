@@ -114,7 +114,9 @@ KVStorage<Clock>::getManySorted(std::string_view key,
 template <TimeGetter Clock>
 inline std::optional<std::pair<std::string, std::string>>
 KVStorage<Clock>::removeOneExpiredEntry() {
-    throw std::runtime_error("Not implemented");
+    std::uint64_t time = _clock.getTime();
+    auto iterator = _timestampToKey.begin();
+    return std::nullopt;
 }
 
 template <TimeGetter Clock>

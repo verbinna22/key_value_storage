@@ -337,3 +337,10 @@ TEST_F(KVSInitBroad,
     EXPECT_EQ(values[3].second, "k4");
     EXPECT_EQ(values[4].second, "k5");
 }
+
+TEST_F(KVSInitBroad, removeOneExpiredEntry_inTheSameTime_returnsNullopt) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(0ULL));
+
+    EXPECT_EQ(storage->removeOneExpiredEntry(), std::nullopt);
+}

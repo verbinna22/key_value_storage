@@ -24,6 +24,22 @@ struct KVSInitSimple : public testing::Test {
     void TearDown() { delete storage; }
 };
 
+struct KVSInitBroad : public testing::Test {
+    MockTimer timer;
+    KVStorage<MockTimerWrapper> *storage;
+
+    void SetUp() {
+        auto entries = std::vector{
+            std::make_tuple<std::string, std::string>("a", "k1", 1U),
+            std::make_tuple<std::string, std::string>("b", "k2", 5U),
+            std::make_tuple<std::string, std::string>("d", "k4", 6U),
+            std::make_tuple<std::string, std::string>("e", "k5", 0U)};
+        EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
+        storage = new KVStorage(entries, MockTimerWrapper(&timer));
+    }
+    void TearDown() { delete storage; }
+};
+
 TEST_F(KVSInitSimple, get_existedValueA_returnsK1) {
     EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
 
@@ -228,4 +244,33 @@ TEST_F(KVSInitSimple, getManySorted_getAllFromCInTheSameTime_returnsThree) {
     EXPECT_EQ(values[0].second, "k3");
     EXPECT_EQ(values[1].second, "k4");
     EXPECT_EQ(values[2].second, "k5");
+}
+
+TEST_F(KVSInitSimple, getManySorted_getTwoFromCInTheSameTime_returnsTwo) {
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
+    auto values = storage->getManySorted("c", 2);
+
+    EXPECT_EQ(values.size(), 2);
+    EXPECT_EQ(values[0].first, "c");
+    EXPECT_EQ(values[1].first, "d");
+    EXPECT_EQ(values[0].second, "k3");
+    EXPECT_EQ(values[1].second, "k4");
+}
+
+TEST_F(KVSInitSimple, getManySorted_getZeroFromCInTheSameTime_returnsZero) {
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
+    auto values = storage->getManySorted("c", 0);
+
+    EXPECT_EQ(values.size(), 0);
+}
+
+TEST_F(KVSInitBroad, getManySorted_getTwoFromCInTheSameTime_returnsTwo) {
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
+    auto values = storage->getManySorted("c", 2);
+
+    EXPECT_EQ(values.size(), 2);
+    EXPECT_EQ(values[0].first, "d");
+    EXPECT_EQ(values[1].first, "e");
+    EXPECT_EQ(values[0].second, "k4");
+    EXPECT_EQ(values[1].second, "k5");
 }

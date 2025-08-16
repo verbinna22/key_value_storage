@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/mnt/data/MyOwnFolder/entertaiment/vk_task/key_value_storage",
+  "command": "/usr/bin/c++  -I\"/mnt/data/MyOwnFolder/entertaiment/vk_task/key_value_storage/main/include/*\" -std=gnu++20 -o CMakeFiles/key_value_storage_test.dir/test/src/main.cpp.o -c /mnt/data/MyOwnFolder/entertaiment/vk_task/key_value_storage/test/src/main.cpp",
+  "file": "/mnt/data/MyOwnFolder/entertaiment/vk_task/key_value_storage/test/src/main.cpp",
+  "output": "CMakeFiles/key_value_storage_test.dir/test/src/main.cpp.o"
+},
+{
+  "directory": "/mnt/data/MyOwnFolder/entertaiment/vk_task/key_value_storage",
+  "command": "/usr/bin/c++  -I\"/mnt/data/MyOwnFolder/entertaiment/vk_task/key_value_storage/main/include/*\" -std=gnu++20 -o CMakeFiles/key_value_storage_test.dir/test/src/test_get.cpp.o -c /mnt/data/MyOwnFolder/entertaiment/vk_task/key_value_storage/test/src/test_get.cpp",
+  "file": "/mnt/data/MyOwnFolder/entertaiment/vk_task/key_value_storage/test/src/test_get.cpp",
+  "output": "CMakeFiles/key_value_storage_test.dir/test/src/test_get.cpp.o"
+}
+]

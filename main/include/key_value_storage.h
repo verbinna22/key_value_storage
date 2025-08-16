@@ -42,10 +42,8 @@ class KVStorage {
         _keyToValue;
     Clock _clock;
 
-    void addWithTimestamp(const std::string &key,
-                          const std::string &value,
-                          std::uint32_t timestamp,
-                          std::uint64_t time);
+    void addWithTimestamp(const std::string &key, const std::string &value,
+                          std::uint32_t timestamp, std::uint64_t time);
 };
 
 template <TimeGetter Clock>
@@ -115,7 +113,15 @@ template <TimeGetter Clock>
 inline std::optional<std::pair<std::string, std::string>>
 KVStorage<Clock>::removeOneExpiredEntry() {
     std::uint64_t time = _clock.getTime();
-    auto iterator = _timestampToKey.begin();
+    auto iterator = _timestampToKey.find(time);
+    if (iterator != _timestampToKey.end()) {
+        auto iteratorToKeyIteratorPair = _keyToValue.find(iterator->second);
+        auto result = std::make_pair(iterator->second,
+                                     iteratorToKeyIteratorPair->second.first);
+        _timestampToKey.erase(iterator);
+        _keyToValue.erase(iteratorToKeyIteratorPair);
+        return result;
+    }
     return std::nullopt;
 }
 

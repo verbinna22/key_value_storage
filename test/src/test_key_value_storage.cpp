@@ -105,10 +105,40 @@ TEST_F(KVSInitSimple, set_nonExistedValueWForeverTimeAfterDelay_returnsKNew) {
 
 TEST_F(KVSInitSimple, set_existedValueA_returnsKNew) {
     EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(7ULL))
+        .WillOnce(testing::Return(7ULL));
+
+    storage->set("a", "kNew", 6U);
+
+    EXPECT_EQ(storage->get("a"), "kNew");
+}
+
+TEST_F(KVSInitSimple, set_existedValueAAfterExpiration_returnsNullopt) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(2ULL))
+        .WillOnce(testing::Return(8ULL));
+
+    storage->set("a", "kNew", 6U);
+
+    EXPECT_EQ(storage->get("a"), std::nullopt);
+}
+
+TEST_F(KVSInitSimple, set_existedValueAForeverTime_returnsKNew) {
+    EXPECT_CALL(timer, getTime())
         .WillOnce(testing::Return(0ULL))
         .WillOnce(testing::Return(0ULL));
 
-    storage->set("a", "kNew", 6U);
+    storage->set("a", "kNew", 0U);
+
+    EXPECT_EQ(storage->get("a"), "kNew");
+}
+
+TEST_F(KVSInitSimple, set_existedValueAForeverTimeAfterDelay_returnsKNew) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(100ULL))
+        .WillOnce(testing::Return(1200ULL));
+
+    storage->set("a", "kNew", 0U);
 
     EXPECT_EQ(storage->get("a"), "kNew");
 }

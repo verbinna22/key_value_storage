@@ -55,6 +55,13 @@ TEST_F(KVSInitSimple, get_existedValueE_returnsK5) {
     EXPECT_EQ(storage->get("e"), "k5");
 }
 
+TEST_F(KVSInitSimple, get_existedValueEAfter200_returnsK5) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(200ULL));
+
+    EXPECT_EQ(storage->get("e"), "k5");
+}
+
 TEST_F(KVSInitSimple, set_nonExistedValueA_returnsKNew) {
     EXPECT_CALL(timer, getTime())
         .WillOnce(testing::Return(0ULL))

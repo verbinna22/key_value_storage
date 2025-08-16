@@ -18,6 +18,8 @@ struct KVSInitSimple : public testing::Test {
             std::make_tuple<std::string, std::string>("d", "k4", 6U),
             std::make_tuple<std::string, std::string>("e", "k5", 0U)
         };
+        EXPECT_CALL(timer, getTime())
+            .WillOnce(testing::Return(0ULL));
         storage = new KVStorage(entries, MockTimerWrapper(&timer));
     }
     void TearDown() {
@@ -32,10 +34,16 @@ TEST_F(KVSInitSimple, get_existedValueA_returnsK1) {
     EXPECT_EQ(storage->get("a"), "k1");
 }
 
-// TEST_F(KVSInitSimple, get_expiredValueA_returnsK1) {
-//     EXPECT_CALL((*timer), getTime())
-//         .WillOnce(testing::Return(0ULL))
-//         .WillOnce(testing::Return(0ULL));
+TEST_F(KVSInitSimple, get_expiredValueAInTime_returnsNullopt) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(1ULL));
 
-//     EXPECT_EQ(storage->get("a"), "k1");
-// }
+    EXPECT_EQ(storage->get("a"), std::nullopt);
+}
+
+TEST_F(KVSInitSimple, get_expiredValueAAfterTime_returnsNullopt) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(2ULL));
+
+    EXPECT_EQ(storage->get("a"), std::nullopt);
+}

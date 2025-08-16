@@ -46,10 +46,10 @@ inline KVStorage<Clock>::KVStorage(
     std::span<std::tuple<std::string, std::string, std::uint32_t>> entries,
     Clock clock)
     : _clock(clock) {
-    _clock.getTime();
+    std::uint64_t time = _clock.getTime();
     for (const auto &entry : entries) {
         auto iterator = _timestampToKey.insert(
-            std::pair(std::get<2>(entry), std::get<0>(entry)));
+            std::pair(time + std::get<2>(entry), std::get<0>(entry)));
         _keyToValue[std::get<0>(entry)] =
             std::make_pair(std::get<1>(entry), iterator);
     }
@@ -73,9 +73,12 @@ inline bool KVStorage<Clock>::remove(std::string_view key) {
 template <TimeGetter Clock>
 inline std::optional<std::string> KVStorage<Clock>::get(
     std::string_view key) const {
-    _clock.getTime();
+    std::uint64_t time = _clock.getTime();
     if (_keyToValue.contains(key)) {
-        return _keyToValue.at(key).first;
+        auto valueIteratorPair = _keyToValue.at(key);
+        if (valueIteratorPair.second->first > time) {
+            return valueIteratorPair.first;
+        }
     }
     return std::nullopt;
 }

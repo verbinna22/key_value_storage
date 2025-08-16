@@ -23,7 +23,7 @@ class KVStorage {
    public:
     explicit KVStorage(
         std::span<std::tuple<std::string, std::string, std::uint32_t>> entries,
-        Clock clock = Clock());
+        Clock *clock = nullptr);
     ~KVStorage();
 
     void set(std::string key, std::string value, std::uint32_t timestamp);
@@ -43,7 +43,7 @@ class KVStorage {
 template <TimeGetter Clock>
 inline KVStorage<Clock>::KVStorage(
     std::span<std::tuple<std::string, std::string, std::uint32_t>> entries,
-    Clock clock) {
+    Clock *clock) {
     throw std::runtime_error("Not implemented");
 }
 

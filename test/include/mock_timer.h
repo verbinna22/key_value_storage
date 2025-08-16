@@ -7,6 +7,7 @@
 #include <cstdint>
 
 class MockTimer {
+public:
     MOCK_METHOD(std::uint64_t, getTime, ());
 };
 

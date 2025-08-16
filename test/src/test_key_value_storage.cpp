@@ -285,3 +285,13 @@ TEST_F(KVSInitSimple,
     EXPECT_EQ(values[1].second, "k4");
     EXPECT_EQ(values[2].second, "k5");
 }
+
+TEST_F(KVSInitSimple,
+       getManySorted_getAllFromStartAfterGreatDelay_returnsUnexpired) {
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(400ULL));
+    auto values = storage->getManySorted("a", 5);
+
+    EXPECT_EQ(values.size(), 1);
+    EXPECT_EQ(values[0].first, "e");
+    EXPECT_EQ(values[0].second, "k5");
+}

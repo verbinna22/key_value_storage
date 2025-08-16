@@ -7,7 +7,6 @@
 #include <map>
 #include <optional>
 #include <span>  // NOLINT
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -25,7 +24,7 @@ class KVStorage {
     explicit KVStorage(
         std::span<std::tuple<std::string, std::string, std::uint32_t>> entries,
         Clock clock = Clock());
-    ~KVStorage();
+    ~KVStorage() = default;
 
     void set(const std::string &key, const std::string &value,
              std::uint32_t timestamp);
@@ -57,9 +56,6 @@ inline KVStorage<Clock>::KVStorage(
                          std::get<2>(entry), time);
     }
 }
-
-template <TimeGetter Clock>
-inline KVStorage<Clock>::~KVStorage() {}
 
 template <TimeGetter Clock>
 inline void KVStorage<Clock>::set(const std::string &key,

@@ -35,7 +35,7 @@ class KVStorage {
     std::optional<std::pair<std::string, std::string>> removeOneExpiredEntry();
 
    private:
-    std::multimap<std::uint32_t, std::string> _timestampToKey;
+    std::multimap<std::uint64_t, std::string> _timestampToKey;
     using timestampIteratorType = decltype(_timestampToKey)::iterator;
     std::map<std::string_view, std::pair<std::string, timestampIteratorType>>
         _keyToValue;

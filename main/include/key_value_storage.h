@@ -78,7 +78,7 @@ inline bool KVStorage<Clock>::remove(std::string_view key) {
         _keyToValue.erase(iteratorToKeyToValueIteratorPair);
         return true;
     }
-    return true;
+    return false;
 }
 
 template <TimeGetter Clock>

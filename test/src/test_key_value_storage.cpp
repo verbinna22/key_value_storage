@@ -153,3 +153,7 @@ TEST_F(KVSInitSimple, remove_existedValueA_doesNotContainA) {
     EXPECT_TRUE(storage->remove("a"));
     EXPECT_EQ(storage->get("a"), std::nullopt);
 }
+
+TEST_F(KVSInitSimple, remove_nonExistedValueU_returnsFalse) {
+    EXPECT_FALSE(storage->remove("u"));
+}

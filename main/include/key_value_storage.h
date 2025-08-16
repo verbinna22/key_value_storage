@@ -67,7 +67,10 @@ template <TimeGetter Clock>
 inline void KVStorage<Clock>::set(std::string key, std::string value,
                                   std::uint32_t timestamp) {
     std::uint64_t time = _clock.getTime();
-    auto iterator = _timestampToKey.insert(std::pair(time + timestamp, key));
+    auto expirationTime = (timestamp == 0)
+                                  ? std::numeric_limits<std::uint64_t>::max()
+                                  : time + timestamp;
+    auto iterator = _timestampToKey.insert(std::pair(expirationTime, key));
     _keyToValue[key] = std::make_pair(value, iterator);
 }
 

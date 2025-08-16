@@ -62,7 +62,7 @@ TEST_F(KVSInitSimple, get_existedValueEAfter200_returnsK5) {
     EXPECT_EQ(storage->get("e"), "k5");
 }
 
-TEST_F(KVSInitSimple, set_nonExistedValueA_returnsKNew) {
+TEST_F(KVSInitSimple, set_nonExistedValueW_returnsKNew) {
     EXPECT_CALL(timer, getTime())
         .WillOnce(testing::Return(0ULL))
         .WillOnce(testing::Return(0ULL));
@@ -70,4 +70,24 @@ TEST_F(KVSInitSimple, set_nonExistedValueA_returnsKNew) {
     storage->set("w", "kNew", 6U);
 
     EXPECT_EQ(storage->get("w"), "kNew");
+}
+
+TEST_F(KVSInitSimple, set_nonExistedValueWForeverTime_returnsKNew) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(0ULL))
+        .WillOnce(testing::Return(0ULL));
+
+    storage->set("w", "kNew", 0U);
+
+    EXPECT_EQ(storage->get("w"), "kNew");
+}
+
+TEST_F(KVSInitSimple, set_existedValueA_returnsKNew) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(0ULL))
+        .WillOnce(testing::Return(0ULL));
+
+    storage->set("a", "kNew", 6U);
+
+    EXPECT_EQ(storage->get("a"), "kNew");
 }

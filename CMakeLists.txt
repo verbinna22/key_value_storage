@@ -18,8 +18,6 @@ include_directories(${PATH_INCLUDES})
 FILE (GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/main/src/*)
 FILE (GLOB_RECURSE TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/main/src/* ${CMAKE_CURRENT_SOURCE_DIR}/test/src/*)
 
-# add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} )
-
 enable_testing()
 add_executable(${PROJECT_NAME}_test ${TEST_SOURCES})
 add_test(${PROJECT_NAME}_test ${PROJECT_NAME}_test)

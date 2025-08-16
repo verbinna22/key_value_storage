@@ -15,7 +15,7 @@
 
 template <class T>
 concept TimeGetter = requires(T getter) {
-    {getter.getTime()} -> std::convertible_to<std::uint64_t>;
+    { getter.getTime() } -> std::convertible_to<std::uint64_t>;
 };  // NOLINT
 
 template <TimeGetter Clock>
@@ -23,7 +23,7 @@ class KVStorage {
    public:
     explicit KVStorage(
         std::span<std::tuple<std::string, std::string, std::uint32_t>> entries,
-        Clock *clock = nullptr);
+        Clock clock = Clock());
     ~KVStorage();
 
     void set(std::string key, std::string value, std::uint32_t timestamp);
@@ -34,21 +34,30 @@ class KVStorage {
     std::optional<std::pair<std::string, std::string>> removeOneExpiredEntry();
 
    private:
-    std::map<std::uint32_t, std::string_view> _timestampToKey;
+    std::multimap<std::uint32_t, std::string> _timestampToKey;
     using timestampIteratorType = decltype(_timestampToKey)::iterator;
-    std::map<std::string, std::pair<std::string, timestampIteratorType>>
+    std::map<std::string_view, std::pair<std::string, timestampIteratorType>>
         _keyToValue;
+    Clock _clock;
 };
 
 template <TimeGetter Clock>
 inline KVStorage<Clock>::KVStorage(
     std::span<std::tuple<std::string, std::string, std::uint32_t>> entries,
-    Clock *clock) {
-    throw std::runtime_error("Not implemented");
+    Clock clock)
+    : _clock(clock) {
+    _clock.getTime();
+    for (const auto &entry : entries) {
+        auto iterator = _timestampToKey.insert(
+            std::pair(std::get<2>(entry), std::get<0>(entry)));
+        _keyToValue[std::get<0>(entry)] =
+            std::make_pair(std::get<1>(entry), iterator);
+    }
 }
 
 template <TimeGetter Clock>
-inline KVStorage<Clock>::~KVStorage() {}
+inline KVStorage<Clock>::~KVStorage() {
+}
 
 template <TimeGetter Clock>
 inline void KVStorage<Clock>::set(std::string key, std::string value,
@@ -64,7 +73,11 @@ inline bool KVStorage<Clock>::remove(std::string_view key) {
 template <TimeGetter Clock>
 inline std::optional<std::string> KVStorage<Clock>::get(
     std::string_view key) const {
-    throw std::runtime_error("Not implemented");
+    _clock.getTime();
+    if (_keyToValue.contains(key)) {
+        return _keyToValue.at(key).first;
+    }
+    return std::nullopt;
 }
 
 template <TimeGetter Clock>

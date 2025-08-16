@@ -7,17 +7,35 @@
 #include "mock_timer.h"
 
 struct KVSInitSimple : public testing::Test {
-    MockTimer *timer;
-    KVStorage<MockTimer> *storage;
+    MockTimer timer;
+    KVStorage<MockTimerWrapper> *storage;
 
     void SetUp() {
-        timer = new MockTimer();
         auto entries = std::vector{
-            std::make_tuple<std::string, std::string>("a", "k1", 1U)};
-        storage = new KVStorage(entries, timer);
+            std::make_tuple<std::string, std::string>("a", "k1", 1U),
+            std::make_tuple<std::string, std::string>("b", "k2", 5U),
+            std::make_tuple<std::string, std::string>("c", "k3", 4U),
+            std::make_tuple<std::string, std::string>("d", "k4", 6U),
+            std::make_tuple<std::string, std::string>("e", "k5", 0U)
+        };
+        storage = new KVStorage(entries, MockTimerWrapper(&timer));
     }
     void TearDown() {
         delete storage;
-        delete timer;
     }
 };
+
+TEST_F(KVSInitSimple, get_existedValueA_returnsK1) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(0ULL));
+
+    EXPECT_EQ(storage->get("a"), "k1");
+}
+
+// TEST_F(KVSInitSimple, get_expiredValueA_returnsK1) {
+//     EXPECT_CALL((*timer), getTime())
+//         .WillOnce(testing::Return(0ULL))
+//         .WillOnce(testing::Return(0ULL));
+
+//     EXPECT_EQ(storage->get("a"), "k1");
+// }

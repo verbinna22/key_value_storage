@@ -113,7 +113,8 @@ template <TimeGetter Clock>
 inline std::optional<std::pair<std::string, std::string>>
 KVStorage<Clock>::removeOneExpiredEntry() {
     std::uint64_t time = _clock.getTime();
-    auto iterator = _timestampToKey.find(time);
+    auto iterator = _timestampToKey.upper_bound(time);
+    --iterator;
     if (iterator != _timestampToKey.end()) {
         auto iteratorToKeyIteratorPair = _keyToValue.find(iterator->second);
         auto result = std::make_pair(iterator->second,

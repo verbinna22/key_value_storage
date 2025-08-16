@@ -72,7 +72,13 @@ inline void KVStorage<Clock>::set(const std::string &key,
 
 template <TimeGetter Clock>
 inline bool KVStorage<Clock>::remove(std::string_view key) {
-    throw std::runtime_error("Not implemented");
+    if (_keyToValue.contains(key)) {
+        auto iteratorToKeyToValueIteratorPair = _keyToValue.find(key);
+        _timestampToKey.erase(iteratorToKeyToValueIteratorPair->second.second);
+        _keyToValue.erase(iteratorToKeyToValueIteratorPair);
+        return true;
+    }
+    return true;
 }
 
 template <TimeGetter Clock>

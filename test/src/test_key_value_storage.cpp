@@ -142,3 +142,7 @@ TEST_F(KVSInitSimple, set_existedValueAForeverTimeAfterDelay_returnsKNew) {
 
     EXPECT_EQ(storage->get("a"), "kNew");
 }
+
+TEST_F(KVSInitSimple, remove_existedValueA_returnsTrue) {
+    EXPECT_TRUE(storage->remove("a"));
+}

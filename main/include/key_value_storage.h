@@ -1,6 +1,7 @@
 #ifndef KEY_VALUE_STORAGE_H
 #define KEY_VALUE_STORAGE_H
 
+#include <concepts>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -12,7 +13,12 @@
 #include <utility>
 #include <vector>
 
-template <class Clock>
+template <class T>
+concept TimeGetter = requires(T getter) {
+    {getter.getTime()} -> std::convertible_to<std::uint64_t>;
+};  // NOLINT
+
+template <TimeGetter Clock>
 class KVStorage {
    public:
     explicit KVStorage(
@@ -34,41 +40,41 @@ class KVStorage {
         _keyToValue;
 };
 
-template <class Clock>
+template <TimeGetter Clock>
 inline KVStorage<Clock>::KVStorage(
     std::span<std::tuple<std::string, std::string, std::uint32_t>> entries,
     Clock clock) {
     throw std::runtime_error("Not implemented");
 }
 
-template <class Clock>
+template <TimeGetter Clock>
 inline KVStorage<Clock>::~KVStorage() {}
 
-template <class Clock>
+template <TimeGetter Clock>
 inline void KVStorage<Clock>::set(std::string key, std::string value,
                                   std::uint32_t timestamp) {
     throw std::runtime_error("Not implemented");
 }
 
-template <class Clock>
+template <TimeGetter Clock>
 inline bool KVStorage<Clock>::remove(std::string_view key) {
     throw std::runtime_error("Not implemented");
 }
 
-template <class Clock>
+template <TimeGetter Clock>
 inline std::optional<std::string> KVStorage<Clock>::get(
     std::string_view key) const {
     throw std::runtime_error("Not implemented");
 }
 
-template <class Clock>
+template <TimeGetter Clock>
 inline std::vector<std::pair<std::string, std::string>>
 KVStorage<Clock>::getManySorted(std::string_view key,
                                 std::uint32_t count) const {
     throw std::runtime_error("Not implemented");
 }
 
-template <class Clock>
+template <TimeGetter Clock>
 inline std::optional<std::pair<std::string, std::string>>
 KVStorage<Clock>::removeOneExpiredEntry() {
     throw std::runtime_error("Not implemented");

@@ -199,8 +199,7 @@ TEST_F(KVSInitSimple,
     EXPECT_EQ(values[4].second, "k5");
 }
 
-TEST_F(KVSInitSimple,
-       getManySorted_getFourFromStartInTheSameTime_returnsFour) {
+TEST_F(KVSInitSimple, getManySorted_getFourFromStartInTheSameTime_returnsFour) {
     EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
     auto values = storage->getManySorted("a", 4);
 
@@ -215,8 +214,7 @@ TEST_F(KVSInitSimple,
     EXPECT_EQ(values[3].second, "k4");
 }
 
-TEST_F(KVSInitSimple,
-       getManySorted_getOneFromStartInTheSameTime_returnsOne) {
+TEST_F(KVSInitSimple, getManySorted_getOneFromStartInTheSameTime_returnsOne) {
     EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
     auto values = storage->getManySorted("a", 1);
 
@@ -225,8 +223,7 @@ TEST_F(KVSInitSimple,
     EXPECT_EQ(values[0].second, "k1");
 }
 
-TEST_F(KVSInitSimple,
-       getManySorted_getZeroFromStartInTheSameTime_returnsZero) {
+TEST_F(KVSInitSimple, getManySorted_getZeroFromStartInTheSameTime_returnsZero) {
     EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(0ULL));
     auto values = storage->getManySorted("a", 0);
 
@@ -273,4 +270,18 @@ TEST_F(KVSInitBroad, getManySorted_getTwoFromCInTheSameTime_returnsTwo) {
     EXPECT_EQ(values[1].first, "e");
     EXPECT_EQ(values[0].second, "k4");
     EXPECT_EQ(values[1].second, "k5");
+}
+
+TEST_F(KVSInitSimple,
+       getManySorted_getAllFromStartAfterDelay_returnsUnexpired) {
+    EXPECT_CALL(timer, getTime()).WillOnce(testing::Return(4ULL));
+    auto values = storage->getManySorted("a", 5);
+
+    EXPECT_EQ(values.size(), 3);
+    EXPECT_EQ(values[0].first, "b");
+    EXPECT_EQ(values[1].first, "d");
+    EXPECT_EQ(values[2].first, "e");
+    EXPECT_EQ(values[0].second, "k2");
+    EXPECT_EQ(values[1].second, "k4");
+    EXPECT_EQ(values[2].second, "k5");
 }

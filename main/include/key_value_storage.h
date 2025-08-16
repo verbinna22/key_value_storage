@@ -98,11 +98,14 @@ template <TimeGetter Clock>
 inline std::vector<std::pair<std::string, std::string>>
 KVStorage<Clock>::getManySorted(std::string_view key,
                                 std::uint32_t count) const {
-    _clock.getTime();
+    std::uint64_t time = _clock.getTime();
     auto iterator = _keyToValue.lower_bound(key);
     std::vector<std::pair<std::string, std::string>> result;
-    while (iterator != _keyToValue.end() && count-- > 0) {
-        result.emplace_back(iterator->first, iterator->second.first);
+    while (iterator != _keyToValue.end() && count > 0) {
+        if (iterator->second.second->first > time) {
+            result.emplace_back(iterator->first, iterator->second.first);
+            --count;
+        }
         ++iterator;
     }
     return result;

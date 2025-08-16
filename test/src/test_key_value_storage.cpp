@@ -146,3 +146,10 @@ TEST_F(KVSInitSimple, set_existedValueAForeverTimeAfterDelay_returnsKNew) {
 TEST_F(KVSInitSimple, remove_existedValueA_returnsTrue) {
     EXPECT_TRUE(storage->remove("a"));
 }
+
+TEST_F(KVSInitSimple, remove_existedValueA_doesNotContainA) {
+    EXPECT_CALL(timer, getTime())
+        .WillOnce(testing::Return(0ULL));
+    EXPECT_TRUE(storage->remove("a"));
+    EXPECT_EQ(storage->get("a"), std::nullopt);
+}
